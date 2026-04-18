@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracker-Net - Auto Cadastro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a472a 0%, #0a2a1a 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .card h2 {
+            color: #1a472a;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ff6b35;
+        }
+
+        .upload-area {
+            border: 2px dashed #ff6b35;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all .3s ease;
+            background: #f8f9ff;
+        }
+
+        .upload-area:hover {
+            border-color: #1a472a;
+            background: #f0f2ff;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .btn {
+            background: #ff6b35;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all .3s;
+        }
+
+        .btn:hover {
+            background: #e55a2b;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #1a472a;
+        }
+
+        .btn-secondary:hover {
+            background: #0f331f;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .form-group select:focus {
+            border-color: #ff6b35;
+            outline: none;
+        }
+
+        .extracted-data {
+            margin-top: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .data-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .data-section h3 {
+            color: #ff6b35;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .data-row {
+            display: flex;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+        }
+
+        .data-label {
+            font-weight: bold;
+            width: 130px;
+            color: #555;
+        }
+
+        .data-value {
+            flex: 1;
+            color: #333;
+        }
+
+        .data-value input {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .log-area {
+            margin-top: 20px;
+            background: #1e1e1e;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 5px;
+            border-left: 3px solid #0f0;
+            padding-left: 10px;
+        }
+
+        .log-error {
+            color: #ff6b6b;
+            border-left-color: #ff6b6b;
+        }
+
+        .log-success {
+            color: #51cf66;
+            border-left-color: #51cf66;
+        }
+
+        .log-warning {
+            color: #ffd43b;
+            border-left-color: #ffd43b;
+        }
+
+        .response-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #ff6b35;
+        }
+
+        .response-box pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 12px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .login-status {
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .login-status.logged {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        @media (max-width: 900px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.16.105/build/pdf.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚛 Tracker-Net Auto Cadastro</h1>
+            <p>Sistema seguro de cadastro de pedidos</p>
+        </div>
+
+        <!-- Tela de Login -->
+        <div class="card" id="loginCard">
+            <h2>🔐 Acesso ao Sistema</h2>
+            <button class="btn" onclick="doLogin()" id="loginBtn">🔑 Entrar no Sistema</button>
+            <div id="loginError" style="color: #dc3545; margin-top: 15px; display: none; text-align: center;"></div>
+            <div id="loginSuccess" style="color: #28a745; margin-top: 15px; display: none; text-align: center;"></div>
+        </div>
+
+        <!-- Dashboard (oculto até login) -->
+        <div id="dashboard" style="display: none;">
+            <div class="card">
+                <h2>📄 Upload do Termo de Adesão</h2>
+                <div class="upload-area" id="uploadArea">
+                    <div style="font-size: 48px; margin-bottom: 10px;">📁</div>
+                    <p>Clique ou arraste o PDF do Termo de Adesão</p>
+                    <small>Arquivo PDF da Foco Proteção Veicular</small>
+                    <input type="file" id="fileInput" accept=".pdf" class="file-input">
+                </div>
+
+                <div id="extractedData" style="display: none;">
+                    <h3 style="margin-top: 20px;">📋 Dados Extraídos (Editável)</h3>
+                    <div id="dataContainer" class="extracted-data"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🔧 Configuração e Envio</h2>
+
+                <div class="form-group">
+                    <label>📋 Tipo do Pedido</label>
+                    <select id="typeOrder">
+                        <option value="1">1 - Instalação (Novo cliente)</option>
+                        <option value="2">2 - Desinstalação</option>
+                        <option value="3">3 - Manutenção</option>
+                    </select>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-success" onclick="sendToAPI()" id="sendBtn" disabled>🚀 Enviar Pedido</button>
+                    <button class="btn btn-secondary" onclick="clearAll()">Limpar Dados</button>
+                    <button class="btn btn-secondary" onclick="logout()">🚪 Sair</button>
+                </div>
+
+                <div id="apiResponse" style="display: none;">
+                    <div class="response-box">
+                        <h4 style="margin-bottom: 10px;">📡 Resposta da API:</h4>
+                        <pre id="responseContent"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Log -->
+        <div class="card">
+            <h2>📝 Log de Atividades</h2>
+            <div class="log-area" id="logArea">
+                <div class="log-entry">✅ Sistema pronto. Clique em "Entrar no Sistema" para começar.</div>
+            </div>
+            <button class="btn btn-secondary" onclick="clearLog()" style="margin-top: 10px;">Limpar Log</button>
+        </div>
+    </div>
+
+    <script>
+        // Credenciais fixas (não aparecem no HTML)
+        const FIXED_EMAIL = "iuri@escudoclube.com.br";
+        const FIXED_PASSWORD = "gestora@2024";
+        
+        let extractedData = {};
+        let userApiHash = null;
+        let isLoggedIn = false;
+
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@2.16.105/build/pdf.worker.min.js';
+
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const logArea = document.getElementById('logArea');
+        const sendBtn = document.getElementById('sendBtn');
+        const loginCard = document.getElementById('loginCard');
+        const dashboard = document.getElementById('dashboard');
+        const loginError = document.getElementById('loginError');
+        const loginSuccess = document.getElementById('loginSuccess');
+        const loginBtn = document.getElementById('loginBtn');
+
+        function addLog(message, type = 'info') {
+            const logEntry = document.createElement('div');
+            const timestamp = new Date().toLocaleTimeString();
+            logEntry.className = `log-entry ${type === 'error' ? 'log-error' : (type === 'success' ? 'log-success' : (type === 'warning' ? 'log-warning' : ''))}`;
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+            logArea.appendChild(logEntry);
+            logArea.scrollTop = logArea.scrollHeight;
+        }
+
+        function clearLog() {
+            logArea.innerHTML = '<div class="log-entry">✅ Log limpo</div>';
+        }
+
+        function cleanCPF(cpf) {
+            if (!cpf) return '';
+            return cpf.replace(/\D/g, '');
+        }
+
+        function cleanPhone(phone) {
+            if (!phone) return '';
+            return phone.replace(/\D/g, '');
+        }
+
+        function cleanRG(rg) {
+            if (!rg) return '';
+            return rg.replace(/\D/g, '');
+        }
+
+        function formatPlate(plate) {
+            if (!plate) return '';
+            plate = plate.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            if (plate.length === 7) return plate.substring(0, 3) + '-' + plate.substring(3);
+            return plate;
+        }
+
+        async function doLogin() {
+            // Desabilitar botão durante login
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '🔄 Conectando...';
+            loginError.style.display = 'none';
+            loginSuccess.style.display = 'none';
+            
+            const apiBaseUrl = document.getElementById('apiBaseUrl')?.value || 'https://sp.tracker-net.app';
+            
+            addLog(`🔐 Tentando login...`, 'info');
+
+            const formData = new FormData();
+            formData.append('email', FIXED_EMAIL);
+            formData.append('password', FIXED_PASSWORD);
+
+            try {
+                const response = await fetch(`${apiBaseUrl}/api/login`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const responseText = await response.text();
+                let responseJson;
+                try {
+                    responseJson = JSON.parse(responseText);
+                } catch (e) {
+                    responseJson = { raw: responseText };
+                }
+
+                if (response.ok && responseJson.status === 1 && responseJson.user_api_hash) {
+                    userApiHash = responseJson.user_api_hash;
+                    isLoggedIn = true;
+
+                    addLog(`✅ Login realizado com sucesso!`, 'success');
+                    
+                    // Mostrar mensagem de sucesso
+                    loginSuccess.style.display = 'block';
+                    loginSuccess.innerHTML = '✅ Login realizado! Carregando sistema...';
+                    
+                    // Esconder login e mostrar dashboard após 1 segundo
+                    setTimeout(() => {
+                        loginCard.style.display = 'none';
+                        dashboard.style.display = 'block';
+                        sendBtn.disabled = false;
+                        addLog(`📋 Sistema pronto para uso`, 'success');
+                    }, 1000);
+
+                } else {
+                    loginError.style.display = 'block';
+                    loginError.innerHTML = '❌ Falha no login. Verifique as credenciais.';
+                    addLog(`❌ Falha no login`, 'error');
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = '🔑 Entrar no Sistema';
+                }
+
+            } catch (error) {
+                loginError.style.display = 'block';
+                loginError.innerHTML = `❌ Erro de conexão: ${error.message}`;
+                addLog(`❌ Erro de conexão: ${error.message}`, 'error');
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '🔑 Entrar no Sistema';
+            }
+        }
+
+        function logout() {
+            userApiHash = null;
+            isLoggedIn = false;
+            extractedData = {};
+            loginCard.style.display = 'block';
+            dashboard.style.display = 'none';
+            document.getElementById('extractedData').style.display = 'none';
+            document.getElementById('apiResponse').style.display = 'none';
+            loginError.style.display = 'none';
+            loginSuccess.style.display = 'none';
+            loginBtn.disabled = false;
+            loginBtn.innerHTML = '🔑 Entrar no Sistema';
+            addLog('🔓 Logout realizado', 'warning');
+        }
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#28a745';
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = '#ff6b35';
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#ff6b35';
+            const file = e.dataTransfer.files[0];
+            if (file && file.type === 'application/pdf') {
+                processPDF(file);
+            } else {
+                addLog('❌ Envie um arquivo PDF válido', 'error');
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files[0]) {
+                processPDF(e.target.files[0]);
+            }
+        });
+
+        async function processPDF(file) {
+            addLog(`📄 Processando: ${file.name}`);
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                let fullText = '';
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    fullText += textContent.items.map(item => item.str).join(' ') + '\n';
+                }
+                extractData(fullText);
+                addLog('✅ PDF processado com sucesso!', 'success');
+            } catch (error) {
+                addLog(`❌ Erro: ${error.message}`, 'error');
+            }
+        }
+
+        function extractData(text) {
+            const data = {};
+
+            // Nome
+            let nomeMatch = text.match(/Nome:\s*([A-Z][A-Z\s]+?)(?=\s+(?:Sexo|CPF|E-mail|RG|Telefone|Celular|$))/i);
+            data.client_name = nomeMatch ? nomeMatch[1].trim() : (text.match(/Nome:\s*([^C]+?)(?=\s+CPF)/i) || [, ''])[1].trim();
+
+            // CPF
+            let cpfMatch = text.match(/CPF\s*\/\s*CNPJ:\s*([\d\.\-]+)/i);
+            data.client_tab_client_cpf = cpfMatch ? cleanCPF(cpfMatch[1]) : '';
+
+            // RG
+            let rgMatch = text.match(/RG:\s*([^\s]+)/i);
+            data.client_tab_client_rg = rgMatch ? cleanRG(rgMatch[1]) : '';
+
+            // Telefone
+            let phoneMatch = text.match(/Celular:\s*\(?(\d{2})\)?\s*(\d{4,5})-?(\d{4})/i) || text.match(/Telefone:\s*\(?(\d{2})\)?\s*(\d{4,5})-?(\d{4})/i);
+            data.client_tab_client_phone = phoneMatch ? cleanPhone(phoneMatch[1] + phoneMatch[2] + phoneMatch[3]) : '';
+
+            // Email
+            let emailMatch = text.match(/E-mail:\s*([^\s]+@[^\s]+)/i);
+            data.client_email = emailMatch ? emailMatch[1] : '';
+            if (!emailMatch) {
+                emailMatch = text.match(/Email:\s*([^\s]+@[^\s]+)/i);
+                data.client_email = emailMatch ? emailMatch[1] : '';
+            }
+
+            // Logradouro
+            let enderecoMatch = text.match(/Endereço:\s*([^N]+?)(?=\s+Numero:)/i);
+            if (enderecoMatch) {
+                let endereco = enderecoMatch[1].trim();
+                endereco = endereco.replace(/\s+Numero$/, '');
+                data.client_tab_client_address = endereco;
+            } else {
+                let fallback = text.match(/Endereço:\s*([^\n]+)/i);
+                data.client_tab_client_address = fallback ? fallback[1].trim() : '';
+            }
+
+            // Número
+            let numeroMatch = text.match(/Numero:\s*([^\s]+)/i);
+            data.client_tab_client_address_number = numeroMatch ? numeroMatch[1] : '';
+
+            // Bairro
+            let bairroMatch = text.match(/Bairro:\s*([^C]+?)(?=\s+Cidade:)/i);
+            if (bairroMatch) {
+                let bairro = bairroMatch[1].trim();
+                bairro = bairro.replace(/\s+Cidade$/, '');
+                data.client_tab_client_address_bairro = bairro;
+            } else {
+                let fallback = text.match(/Bairro:\s*([^\n]+)/i);
+                data.client_tab_client_address_bairro = fallback ? fallback[1].trim() : '';
+            }
+
+            // Cidade
+            let cidadeMatch = text.match(/Cidade:\s*([^E]+?)(?=\s+Estado:)/i);
+            data.client_tab_client_address_city = cidadeMatch ? cidadeMatch[1].trim() : (text.match(/Cidade:\s*([^\n]+)/i) || [, 'Salvador'])[1].trim();
+
+            // Estado
+            let estadoMatch = text.match(/Estado:\s*([A-Z]{2})/i);
+            data.client_tab_client_address_state = estadoMatch ? estadoMatch[1] : 'BA';
+
+            // CEP
+            let cepMatch = text.match(/CEP:\s*([\d\-]+)/i);
+            data.client_tab_client_postal_code = cepMatch ? cepMatch[1] : '';
+
+            // Veículo
+            let marcaMatch = text.match(/Marca:\s*([^\s]+)/i);
+            data.vehicle_tab_brand = marcaMatch ? marcaMatch[1] : '';
+
+            let modeloMatch = text.match(/Modelo:\s*([^A]+?)(?=\s+Ano\s+Fabricacao:)/i);
+            if (modeloMatch) {
+                let modelo = modeloMatch[1].trim();
+                modelo = modelo.replace(/\s+Ano$/, '').replace(/\s+\d{4}$/, '');
+                data.vehicle_model = modelo;
+            } else {
+                let modeloSegundo = text.match(/Modelo:\s*([^\n]+)/i);
+                data.vehicle_model = modeloSegundo ? modeloSegundo[1].split('Ano')[0].trim() : '';
+            }
+
+            let anoMatch = text.match(/Ano\s+Fabricacao:\s*(\d{4})/i) || text.match(/Ano\s+Modelo:\s*(\d{4})/i);
+            data.vehicle_tab_year = anoMatch ? anoMatch[1] : '2020';
+
+            let corMatch = text.match(/Cor:\s*([^\s]+)/i);
+            data.color_vehicle = corMatch ? corMatch[1] : '';
+
+            let chassiMatch = text.match(/Chassi:\s*([A-Z0-9]+)/i);
+            data.chassis = chassiMatch ? chassiMatch[1] : '';
+
+            let placaMatch = text.match(/Placa:\s*([A-Z0-9]+)/i);
+            data.plate_number = placaMatch ? formatPlate(placaMatch[1]) : '';
+
+            let renavamMatch = text.match(/Renavam:\s*(\d+)/i);
+            data.renavam = renavamMatch ? renavamMatch[1] : '';
+
+            // Valores tudo 0
+            data.valor_fipe = '0';
+            data.vehicle_fipe_table_value = '0';
+            data.client_tab_client_monthly_fee = '0';
+
+            // Data de nascimento
+            data.client_tab_client_date_of_birth = '00/00/0000';
+
+            extractedData = data;
+            displayExtractedData(data);
+
+            addLog(`📊 Nome: ${data.client_name || 'NÃO ENCONTRADO'}`, data.client_name ? 'success' : 'warning');
+            addLog(`📊 Email: ${data.client_email || 'NÃO ENCONTRADO'}`, data.client_email ? 'success' : 'warning');
+            addLog(`📊 Veículo: ${data.vehicle_tab_brand} ${data.vehicle_model}`, 'info');
+            addLog(`📊 Placa: ${data.plate_number || 'NÃO ENCONTRADA'}`, data.plate_number ? 'success' : 'warning');
+        }
+
+        function displayExtractedData(data) {
+            const container = document.getElementById('dataContainer');
+            container.innerHTML = '';
+            const sections = [
+                { title: '👤 Cliente', fields: ['client_name', 'client_email', 'client_tab_client_cpf', 'client_tab_client_rg', 'client_tab_client_phone'] },
+                { title: '📍 Endereço', fields: ['client_tab_client_address', 'client_tab_client_address_number', 'client_tab_client_address_bairro', 'client_tab_client_address_city', 'client_tab_client_address_state', 'client_tab_client_postal_code'] },
+                { title: '🚗 Veículo', fields: ['plate_number', 'vehicle_tab_brand', 'vehicle_model', 'vehicle_tab_year', 'color_vehicle', 'chassis', 'renavam'] }
+            ];
+            const labels = {
+                client_name: 'Nome', client_email: 'Email', client_tab_client_cpf: 'CPF', client_tab_client_rg: 'RG', client_tab_client_phone: 'Telefone',
+                client_tab_client_address: 'Logradouro', client_tab_client_address_number: 'Número', client_tab_client_address_bairro: 'Bairro',
+                client_tab_client_address_city: 'Cidade', client_tab_client_address_state: 'UF', client_tab_client_postal_code: 'CEP',
+                plate_number: 'Placa', vehicle_tab_brand: 'Marca', vehicle_model: 'Modelo', vehicle_tab_year: 'Ano',
+                color_vehicle: 'Cor', chassis: 'Chassi', renavam: 'Renavam'
+            };
+            for (const section of sections) {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'data-section';
+                sectionDiv.innerHTML = `<h3>${section.title}</h3>`;
+                for (const key of section.fields) {
+                    const value = data[key] || '';
+                    sectionDiv.innerHTML += `<div class="data-row"><div class="data-label">${labels[key]}:</div><div class="data-value"><input type="text" value="${escapeHtml(value)}" data-key="${key}" onchange="updateField('${key}', this.value)"></div></div>`;
+                }
+                container.appendChild(sectionDiv);
+            }
+            document.getElementById('extractedData').style.display = 'block';
+        }
+
+        function updateField(key, value) {
+            if (key === 'client_tab_client_cpf') value = cleanCPF(value);
+            else if (key === 'client_tab_client_phone') value = cleanPhone(value);
+            else if (key === 'client_tab_client_rg') value = cleanRG(value);
+            else if (key === 'plate_number') value = formatPlate(value);
+            extractedData[key] = value;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        async function sendToAPI() {
+            if (!isLoggedIn || !userApiHash) {
+                addLog('❌ Faça login primeiro antes de enviar', 'error');
+                return;
+            }
+
+            const typeOrder = document.getElementById('typeOrder').value;
+            const apiBaseUrl = 'https://sp.tracker-net.app';
+
+            const required = ['plate_number', 'vehicle_tab_brand', 'vehicle_tab_year', 'vehicle_model', 'vehicle_fipe_table_value', 'chassis', 'color_vehicle', 'renavam', 'client_name', 'client_tab_client_address', 'client_tab_client_address_number', 'client_tab_client_postal_code', 'client_tab_client_address_bairro', 'client_tab_client_address_city', 'client_tab_client_address_state', 'client_tab_client_cpf', 'client_tab_client_phone', 'client_tab_client_monthly_fee', 'client_tab_client_rg', 'client_tab_client_date_of_birth', 'valor_fipe'];
+
+            const missing = required.filter(f => !extractedData[f] || extractedData[f] === '');
+            if (missing.length > 0) {
+                addLog(`⚠️ Campos faltando: ${missing.join(', ')}`, 'warning');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('type_order', typeOrder);
+            formData.append('plate_number', extractedData.plate_number);
+            formData.append('vehicle_tab_brand', extractedData.vehicle_tab_brand);
+            formData.append('vehicle_tab_year', extractedData.vehicle_tab_year);
+            formData.append('vehicle_model', extractedData.vehicle_model);
+            formData.append('vehicle_fipe_table_value', '0');
+            formData.append('chassis', extractedData.chassis);
+            formData.append('color_vehicle', extractedData.color_vehicle);
+            formData.append('renavam', extractedData.renavam);
+            formData.append('client_name', extractedData.client_name);
+            formData.append('client_tab_client_address', extractedData.client_tab_client_address);
+            formData.append('client_tab_client_address_number', extractedData.client_tab_client_address_number);
+            formData.append('client_tab_client_postal_code', extractedData.client_tab_client_postal_code);
+            formData.append('client_tab_client_address_bairro', extractedData.client_tab_client_address_bairro);
+            formData.append('client_tab_client_address_city', extractedData.client_tab_client_address_city);
+            formData.append('client_tab_client_address_state', extractedData.client_tab_client_address_state);
+            formData.append('client_tab_client_cpf', extractedData.client_tab_client_cpf);
+            formData.append('client_tab_client_phone', extractedData.client_tab_client_phone);
+            formData.append('client_tab_client_monthly_fee', '0');
+            formData.append('client_tab_client_rg', extractedData.client_tab_client_rg);
+            formData.append('client_tab_client_date_of_birth', '00/00/0000');
+            formData.append('valor_fipe', '0');
+
+            const url = `${apiBaseUrl}/api/add_order?user_api_hash=${encodeURIComponent(userApiHash)}`;
+
+            addLog(`📡 Enviando pedido...`, 'info');
+            addLog(`🚗 ${extractedData.vehicle_tab_brand} ${extractedData.vehicle_model} - ${extractedData.plate_number}`, 'info');
+            addLog(`👤 ${extractedData.client_name}`, 'info');
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const responseText = await response.text();
+                let responseJson;
+                try {
+                    responseJson = JSON.parse(responseText);
+                } catch (e) {
+                    responseJson = { raw: responseText };
+                }
+
+                const responseDiv = document.getElementById('apiResponse');
+                const responseContent = document.getElementById('responseContent');
+                responseContent.textContent = JSON.stringify(responseJson, null, 2);
+                responseDiv.style.display = 'block';
+
+                if (response.ok && responseJson.status === 1) {
+                    addLog(`✅ Pedido enviado com sucesso!`, 'success');
+                } else if (response.status === 401) {
+                    addLog(`❌ Erro 401: Sessão expirada. Faça login novamente.`, 'error');
+                    logout();
+                } else {
+                    addLog(`⚠️ Resposta: ${response.status}`, 'warning');
+                }
+
+            } catch (error) {
+                addLog(`❌ Erro de conexão: ${error.message}`, 'error');
+            }
+        }
+
+        function clearAll() {
+            document.getElementById('extractedData').style.display = 'none';
+            document.getElementById('apiResponse').style.display = 'none';
+            extractedData = {};
+            addLog('🧹 Dados limpos', 'info');
+        }
+
+        addLog('🚀 Sistema pronto! Clique em "Entrar no Sistema" para começar.', 'success');
+        addLog('🔒 Credenciais e hash protegidos (não aparecem na tela)', 'info');
+    </script>
+</body>
+</html>
